@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+        <!--
+       容器指的就是beans
+       Hello hello = new Hello();
+       id ：变量名
+       class : new 对象
+       property ：给属性赋值
+       -->
+    <bean id="mySqlImpl" class="com.study.dao.UserDaoMysqlImpl"></bean>
+    <bean id="oracleImpl" class="com.study.dao.UserDaoOracleImpl"></bean>
+    <bean id="sqlServerImpl" class="com.study.dao.UserDaoSqlserverImpl"></bean>
+    <bean id="userService" class="com.study.service.UserServiceImpl">
+        <!-- collaborators and configuration for this bean go here -->
+        <property name="userDao" ref="mySqlImpl"></property>
+    </bean>
+
+
+    <!-- more bean definitions go here -->
+
+</beans>
