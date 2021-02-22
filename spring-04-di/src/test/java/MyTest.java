@@ -28,7 +28,9 @@ public class MyTest {
     public void testCPNamespace(){
         ApplicationContext context = new ClassPathXmlApplicationContext("bean.xml");
         User user = context.getBean("user2", User.class);
-        System.out.println(user);
+        User user1 = context.getBean("user2", User.class);
+        System.out.println(user==user1); //单例模式时是：true，原型模式时是：false
+
     }
 }
 

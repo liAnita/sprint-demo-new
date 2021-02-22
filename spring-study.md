@@ -223,3 +223,20 @@ application.xml中导入多个配置，使用总的配置即可！
 >xmlns:c="http://www.springframework.org/schema/c"
 >```
 
+#bean的作用域
+![bean的作用域](/Users/langli/Desktop/study/java/spring-demo-new/study-image/image-01.png)
+1. Singleton 单例模式（在整个软件系统中，只会产生该类的一个对象）（Spring默认机制）
+![Singleton](/Users/langli/Desktop/study/java/spring-demo-new/study-image/singleton.png)
+   ```xml
+    <bean id="accountService" class="com.something.DefaultAccountService"/>
+    <!-- the following is equivalent, though redundant (singleton scope is the default) -->
+    <bean id="accountService" class="com.something.DefaultAccountService" scope="singleton"/>
+    ```
+2. Prototype 原型模式：每次从容器中get的时候，都会产生一个新的对象
+   
+    ![Prototype](/Users/langli/Desktop/study/java/spring-demo-new/study-image/Prototype.png)
+   ```xml
+   <bean id="accountService" class="com.something.DefaultAccountService" scope="prototype"/>
+   ```
+3. 其余的request、session、applicaiton 只能在web开发中使用到
+

@@ -7,10 +7,11 @@
         https://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd">
 
     <!--使用p-namespace进行更简洁的 XML 配置 -->
+    <!--默认scope="singleton"-->
     <bean id="user" class="com.study.pojo.User" p:name="易烊千玺" p:age="18"></bean>
 
 
     <!--使用c-namespace进行更简洁的 XML 配置 -->
-    <bean id="user2" class="com.study.pojo.User" c:name="四字弟弟" c:age="19"></bean>
+    <bean id="user2" class="com.study.pojo.User" c:name="四字弟弟" c:age="19" scope="prototype"></bean>
 
 </beans>
