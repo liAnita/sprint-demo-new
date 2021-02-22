@@ -116,3 +116,20 @@
     </bean>
 </beans>
 ```
+
+###扩展方式注入
+```xml
+ <!--使用p-namespace（properties）进行更简洁的 XML 配置 -->
+    <bean id="user" class="com.study.pojo.User" p:name="易烊千玺" p:age="18"></bean>
+
+    <!--使用c-namespace(construct-arg)进行更简洁的 XML 配置 -->
+    <bean id="user2" class="com.study.pojo.User" c:name="四字弟弟" c:age="19"></bean>
+
+```
+>注意事项：
+>1.需要在xml头部导入约束文件 2.c-namespace需要实体类包含有参构造
+>```xml
+>xmlns:p="http://www.springframework.org/schema/p"
+>xmlns:c="http://www.springframework.org/schema/c"
+>```
+

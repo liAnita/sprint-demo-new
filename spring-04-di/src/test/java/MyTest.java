@@ -1,4 +1,5 @@
 import com.study.pojo.Student;
+import com.study.pojo.User;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -22,4 +23,13 @@ public class MyTest {
             studentInfo={user=root, Driver=mysql.5.0, pwd=123456}
       }
      */
+
+    @Test
+    public void testCPNamespace(){
+        ApplicationContext context = new ClassPathXmlApplicationContext("bean.xml");
+        User user = context.getBean("user2", User.class);
+        System.out.println(user);
+    }
 }
+
+
