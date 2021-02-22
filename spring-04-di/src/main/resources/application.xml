@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean id="address" class="com.study.pojo.Address">
+        <property name="address" value="上海"/>
+    </bean>
+    <bean id="student" class="com.study.pojo.Student">
+        <!-- 普通值注入  value=...    -->
+        <property name="name" value="易烊千玺"/>
+
+        <!--bean注入 ref=''-->
+        <property name="address" ref="address"/>
+
+        <!--数组注入 array-->
+        <property name="hobbies">
+            <array>
+                <value>读书</value>
+                <value>看电影</value>
+                <value>写代码</value>
+            </array>
+        </property>
+
+        <!--List注入 -->
+        <property name="games">
+            <list>
+                <value>LOL</value>
+                <value>王者荣耀</value>
+                <value>吃鸡</value>
+                <value>魂斗罗</value>
+            </list>
+        </property>
+
+        <!--!map注入 -->
+        <property name="score">
+            <map>
+                <entry key="math" value="120"></entry>
+                <entry key="chinese" value="100"></entry>
+                <entry key="english" value="90"></entry>
+                <entry key="biology" value="80"></entry>
+            </map>
+        </property>
+
+        <!--set注入 -->
+        <property name="subject">
+            <set>
+                <value>biology</value>
+                <value>chemistry</value>
+                <value>physics</value>
+            </set>
+        </property>
+
+        <!--null注入 -->
+        <property name="work" >
+            <null></null>
+        </property>
+
+        <!--!properties注入 -->
+        <property name="studentInfo">
+            <props>
+                <prop key="Driver">mysql.5.0</prop>
+                <prop key="user">root</prop>
+                <prop key="pwd">123456</prop>
+            </props>
+        </property>
+    </bean>
+</beans>
