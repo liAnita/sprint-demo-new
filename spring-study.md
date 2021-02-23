@@ -1,7 +1,9 @@
-[狂神说笔记]
+[狂神说笔记][https://www.kuangstudy.com/bbs/1344884033053581313](https://www.kuangstudy.com/bbs/1344884033053581313)
 
-[狂神说笔记]: https://www.kuangstudy.com/bbs/1344884033053581313
-#IOC理论推导
+https://mp.weixin.qq.com/s/kvp_3Uva1J2Q5ZVqCUzEsA
+
+# IOC理论推导
+
 在我们之前的业务中，用户的需求可能会影响我们原来的代码，我们需要根据用户的需求修改源代码
 如果程序代码量十分大，需改一次的代价十分昂贵！
 我们使用一个set接口实现，已经发生了革命性的变化
@@ -17,7 +19,8 @@
 - 使用了set注入后，程序员不再具有主动性，而是变成了被动的接受对象！
 - 这种思想从本质上解决了问题，我们程序员不用再去管理对象的创建了。
 
-###IOC本质
+# IOC本质
+
 ```text
 控制反转loC(Inversion of Control)，是一种设计思想，DI(依赖注入)是实现loC的一种方法，也有人认为DI只是loC的另一种说法。没有loC的程序中，我们使用面向对象编程，对象的创建与对象间的依赖关系完全硬编码在程序中，对象的创建由程序自己控制，控制反转后将对象的创建转移给第三方，个人认为所谓控制反转就是:获得依赖对象的方式反转了。
 采用XML方式配置Bean的时候，Bean的定义信息是和实现分离的，而采用注解的方式可以把两者合为一体，Bean的定义信息直接以注解的形式定义在实现类中，从而达到了零配置的目的。
@@ -26,20 +29,20 @@
 ```
 
 # IOC创建对象的方式
-1. 使用无参构造函数，默认。
+1. **使用无参构造函数，默认。**
 ```xml
-<!--默认无参-->
-    <bean id="user" class="com.srz.pojo.User">
-        <property name="name" value="超级大帅哥"></property>
-    </bean>
+  <!--默认无参-->
+      <bean id="user" class="com.srz.pojo.User">
+          <property name="name" value="超级大帅哥"></property>
+      </bean>
 ```
-2. 有参构造创建对象
+2. **有参构造创建对象**
 
    ```xml
    <!-- 第一种，下标赋值的操作 index指的是元素的个数-->
    <bean id="userT" class="com.srz.pojo.User">
-           &lt;!&ndash; index指构造方法 , 下标从0开始 &ndash;&gt;   Exception
-           <constructor-arg index="0" value="srzzz"/>
+     &lt;!&ndash; index指构造方法 , 下标从0开始 &ndash;&gt;   Exception
+     <constructor-arg index="0" value="srzzz"/>
    </bean>
    ```
    ```xml
@@ -57,13 +60,16 @@
    ```
 总结：在配置文件加载的时候，容器中的对象就已经初始化了！
 
-#Spring的配置
-###别名
+# Spring的配置
+
+### 1. 别名
+
 ```xml
 <!--  别名  -->
 <alias name="user" alias="u"></alias>
 ```
-###Beam的配置
+### 2. Beam的配置
+
 ```xml
 <!--
        id 是bean的标识符,要唯一,如果没有配置id,name就是默认标识符
@@ -76,7 +82,8 @@
     <property name="name" value="Spring"/>
 </bean>
 ```
-###Import
+### 3. Import
+
 ```xml
 <import resource="{path}/beans.xml"/>
 ```
@@ -88,8 +95,12 @@ application.xml中导入多个配置，使用总的配置即可！
 <import resource="beans2.xml"/>
 ```
 
-#依赖注入（DI）
-###构造器注入
+
+
+# 依赖注入（DI）
+
+### 构造器注入
+
 >前面已经说过(无参、有参),参考spring-03-ioc。
 ````xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -140,7 +151,8 @@ application.xml中导入多个配置，使用总的配置即可！
 <!--    </bean>-->
 </beans>
 ``````
-###Set方式注入(重点)
+### Set方式注入(重点)
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -207,7 +219,8 @@ application.xml中导入多个配置，使用总的配置即可！
 </beans>
 ```
 
-###扩展方式注入
+### 扩展方式注入
+
 ```xml
  <!--使用p-namespace（properties）进行更简洁的 XML 配置 -->
     <bean id="user" class="com.study.pojo.User" p:name="易烊千玺" p:age="18"></bean>
@@ -223,20 +236,132 @@ application.xml中导入多个配置，使用总的配置即可！
 >xmlns:c="http://www.springframework.org/schema/c"
 >```
 
-#bean的作用域
-![bean的作用域](/Users/langli/Desktop/study/java/spring-demo-new/study-image/image-01.png)
-1. Singleton 单例模式（在整个软件系统中，只会产生该类的一个对象）（Spring默认机制）
-![Singleton](/Users/langli/Desktop/study/java/spring-demo-new/study-image/singleton.png)
+# bean的作用域
+
+![image-20201203083618833](https://typora-blog.oss-cn-qingdao.aliyuncs.com/image-20201203083618833.png)
+
+1. **Singleton 单例模式（在整个软件系统中，只会产生该类的一个对象）（Spring默认机制）**
+![img](https://typora-blog.oss-cn-qingdao.aliyuncs.com/singleton.png?d=1614047731989)
+   
    ```xml
     <bean id="accountService" class="com.something.DefaultAccountService"/>
     <!-- the following is equivalent, though redundant (singleton scope is the default) -->
     <bean id="accountService" class="com.something.DefaultAccountService" scope="singleton"/>
-    ```
-2. Prototype 原型模式：每次从容器中get的时候，都会产生一个新的对象
-   
-    ![Prototype](/Users/langli/Desktop/study/java/spring-demo-new/study-image/Prototype.png)
+   ```
+2. **Prototype 原型模式：每次从容器中get的时候，都会产生一个新的对象**![image-20201203084410401](https://typora-blog.oss-cn-qingdao.aliyuncs.com/image-20201203084410401.png)
+
    ```xml
    <bean id="accountService" class="com.something.DefaultAccountService" scope="prototype"/>
    ```
-3. 其余的request、session、applicaiton 只能在web开发中使用到
+
+3. **其余的request、session、applicaiton 只能在web开发中使用到**
+
+
+
+# Bean的自动装配
+
+由于在手动配置xml过程中，常常发生字母缺漏和大小写等错误，而无法对其进行检查，使得开发效率降低。
+
+采用自动装配将避免这些错误，并且使配置简单化。
+
+- 自动装配是spring满足bean依赖的一种方式
+- spring会在上下文中自动寻找，并自动给bean装配属性
+
+在spring中装配有**三种**方式
+
+1. 在xml中显示的配置
+
+2. 在java 中显示配置
+3. ==隐士的自动装配 【重要==】
+
+这里我们主要讲第三种：自动化的装配bean。
+
+Spring的自动装配需要从两个角度来实现，或者说是两个操作：
+
+1. 组件扫描(component scanning)：spring会自动发现应用上下文中所创建的bean；
+2. 自动装配(autowiring)：spring自动满足bean之间的依赖，也就是我们说的IoC/DI；
+
+组件扫描和自动装配组合发挥巨大威力，使得显示的配置降低到最少。
+
+### 1. **byName (按名称自动装配)**
+
+```xml
+ <!-- byName : 会在上下文中自动化查找，和自己对象set方法参数值相同的beanId-->
+<bean id="user" class="com.kuang.pojo.User" autowire="byName">
+   <property name="str" value="langli"/>
+</bean>
+```
+
+**小结：**
+
+当一个bean节点带有 autowire byName的属性时。
+
+1. 将查找其类中所有的set方法名，例如setCat，获得将set去掉并且首字母小写的字符串，即cat。
+2. 去spring容器中寻找是否有此字符串名称id的对象。
+3. 如果有，就取出注入；如果没有，就报空指针异常。
+
+### 2.byType (按类型自动装配)
+
+==使用autowire byType首先需要保证：同一类型的对象，在spring容器中唯一。如果不唯一，会报不唯一的异常:NoUniqueBeanDefinitionException。==
+
+```xml
+ <!-- byType : 会在上下文中自动化查找，和自己对象属性相同的bean, bytype可以省略beanId-->
+<bean id="user" class="com.kuang.pojo.User" autowire="byType">
+   <property name="str" value="langli"/>
+</bean>
+```
+
+**推荐不使用自动装配xml配置 , 而使用注解 .**
+
+
+
+### 3.使用注解装配
+
+> jdk1.5开始支持注解，spring2.5开始全面支持注解。
+
+准备工作：利用注解的方式注入属性。
+
+1. 在Spring配置文件中导入约束
+
+```xml
+xmlns:context="http://www.springframework.org/schema/context"
+
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd
+```
+
+2. 开启属性注解支持
+
+   ```xml
+   <!-- 开启属性注解支持-->
+   <context:annotation-config></context:annotation-config>
+   ```
+
+#### @Autowired
+
+```java
+@Resource(name = "cat...")
+//其区别是Autowired可以动过ByName和ByType，而Resource只能通过ByName
+//代表如果找不到装配的 不抛出异常 正常情况下找不到直接抛异常
+required = false
+@Autowired
+@Qualifier(value = "dog111")   
+/*
+需要和Autowired配合使用    如果类型的值不唯一则将Autowired的required默认属性值设为false，再配合Qualifier进行使用
+*/
+@Nullable //段标记了这个注解，说明这个字段可以为null
+```
+
+- 直接在属性上使用即可！也可以在set上使用！
+- 使用Autowired可以不用再写set方法了，前提是自动装配的属性在IOC容器（Spring容器）中存在且符合名字ByType！
+
+**@Autowired与@Resource异同：**
+
+1. @Autowired与@Resource都可以用来装配bean。都可以写在字段上，或写在setter方法上。
+
+2. @Autowired默认按类型装配（属于spring规范），默认情况下必须要求依赖对象必须存在，如果要允许null 值，可以设置它的required属性为false，如：@Autowired(required=false) ，如果我们想使用名称装配可以结合@Qualifier注解进行使用
+
+3. @Resource（属于J2EE复返），默认按照名称进行装配，名称可以通过name属性进行指定。如果没有指定name属性，当注解写在字段上时，默认取字段名进行按照名称查找，如果注解写在setter方法上默认取属性名进行装配。当找不到与名称匹配的bean时才按照类型进行装配。但是需要注意的是，如果name属性一旦指定，就只会按照名称进行装配。
+
+4. 它们的作用相同都是用注解方式注入对象，但执行顺序不同。@Autowired先byType，@Resource先byName。
 

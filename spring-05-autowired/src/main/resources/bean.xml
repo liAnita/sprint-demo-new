@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <bean id="cat1" class="com.study.pojo.Cat"></bean>
+<!--    <bean id="cat2" class="com.study.pojo.Cat"></bean>-->
+    <bean id="dog" class="com.study.pojo.Dog"></bean>
+    <bean id="dog2" class="com.study.pojo.Dog"></bean>
+    <bean id="person" class="com.study.pojo.Person">
+        <property name="name" value="小可爱啊"></property>
+    </bean>
+
+        <!-- 开启属性注解支持-->
+    <context:annotation-config></context:annotation-config>
+
+    <!-- byName : 会在上下文中自动化查找，和自己对象set方法参数值相同的beanId-->
+    <!-- byType : 会在上下文中自动化查找，和自己对象属性相同的bean, bytype可以省略beanId-->
+<!--    <bean id="person" class="com.study.pojo.Person" autowire="byName">-->
+<!--        <property name="name" value="易烊千玺小可爱"/>-->
+        <!--可以通过autowire自动装配属性 ，不需要设置属性值 -->
+        <!--        <property name="dog" ref="dog"/>-->
+        <!--        <property name="cat" ref="cat"/>-->
+<!--    </bean>-->
+
+</beans>
