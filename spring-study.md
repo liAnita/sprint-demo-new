@@ -365,3 +365,219 @@ required = false
 
 4. 它们的作用相同都是用注解方式注入对象，但执行顺序不同。@Autowired先byType，@Resource先byName。
 
+
+
+# 使用注解开发
+
+### 1.注意
+
+- 在spring4之后要保证spring-aop包导入
+
+```java
+<dependency>
+  <groupId>org.springframework</groupId>
+  <artifactId>spring-aop</artifactId>
+  <version>5.3.1</version>
+</dependency>
+```
+
+- 使用注解需要导入context约束，增加注解支持
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:context="http://www.springframework.org/schema/context"
+      xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+    <!--  开启注解支持  -->
+    <context:annotation-config></context:annotation-config>
+</beans>
+```
+
+### 2.bean用注解实现
+
+我们之前都是使用 bean 的标签进行bean注入，但是实际开发中，我们一般都会使用注解！
+
+```xml
+1、配置扫描哪些包下的注解
+<!--指定注解扫描包-->
+<context:component-scan base-package="com.kuang.pojo"/>
+```
+
+```java
+2、在指定包下编写类，增加注解
+// 相当于配置文件中 <bean id="user" class="当前注解的类"/>
+@Component("user") //可以指定beanId,
+@Component //不指定beanId是，默认为类名称首字母小写
+public class User {
+   public String name = "秦疆";
+}
+```
+
+### 3.属性如何注入
+
+```java
+//组件
+//此注解等价于 bean
+@Component
+public class User {
+    //Value注解相当于xml中bean的赋值操作
+    @Value("srz")
+    public String name;
+}
+```
+
+### 4.衍生注解
+
+[@Component](https://github.com/Component)有几个衍生注解，为了更好的进行分层，Spring可以使用其它三个注解，功能一样，目前使用哪一个功能都一样
+
+- dao【[@Repository](https://github.com/Repository)】
+
+  ```java
+  @Repository
+  public class UserDao {
+      public UserDao() {
+          System.out.println("这是UserDao的无参构造函数！");
+      }
+  }
+  ```
+
+- sevice【[@Service](https://github.com/Service)】
+
+  ```java
+  @Service
+  public class UerService {
+      public UerService() {
+          System.out.println("这是UserService的无参构造函数！");
+      }
+  }
+  
+  ```
+
+- controller【@Controller】
+
+  ```java
+  @Controller
+  public class UserController {
+      public UserController() {
+          System.out.println("这是UserController的无参构造函数！");
+      }
+  }
+  ```
+
+这四个注解的功能是一样的，都是都是代表将某个类注册到Sprng中，装配Bean
+
+### 5.作用域
+
+- singleton：默认的，Spring会采用单例模式创建这个对象。关闭工厂 ，所有的对象都会销毁。
+- prototype：多例模式。关闭工厂 ，所有的对象不会销毁。内部的垃圾回收机制会回收
+
+```java
+@Controller("user")
+@Scope("prototype")
+public class User {
+   @Value("langli")
+   public String name;
+}
+```
+
+### 6.自动装配
+
+- @autowire,前面已学习。
+
+### 7.小结
+
+xml与注解
+
+- xml 更加万能，适用于任何场合！维护方便！但配置稍显麻烦
+- 注解 不是自己类用不了，维护相对复杂！
+
+xml 与 注解 的最佳实践
+
+- xml用来管理bean
+- 注解只负责完成属性的注入
+- 在使用过程中，只需要注意一个问题：必须让注解生效，需要开启注解的支持
+
+```xml
+<!--  指定扫描包，这个包下的注解就会生效  -->
+<context:component-scan base-package="com.srz.pojo"></context:component-scan>
+<!--  开启注解支持  -->
+<context:annotation-config/>
+<!--作用：
+1.进行注解驱动注册，从而使注解生效
+2.用于激活那些已经在spring容器里注册过的bean上面的注解，也就是显示的向Spring注册
+3.如果不扫描包，就需要手动配置bean
+4.如果不加注解驱动，则注入的值为null！-->
+```
+
+
+
+# 使用javaConfig实现配置
+
+JavaConfig 原来是 Spring 的一个子项目，它通过 Java 类的方式提供 Bean 的定义信息，在 Spring4 的版本， JavaConfig 已正式成为 Spring4 的核心功能 
+
+- 实体类
+
+  ```java
+  //@Component表示这个类被spring接管，将User注册到容器中
+  @Component
+  public class User {
+  
+      @Value("小可爱")
+      private String name;
+  
+      @Override
+      public String toString() {
+          return "User{" +
+                  "name='" + name + '\'' +
+                  '}';
+      }
+  }
+  ```
+
+- 配置类
+
+  ```java
+  /*
+   这个类也会被Spring托管，注入到ioc容器中，因为它本身就是一个Component
+  1.@Configuration 表示这是一个配置类，等价于之前学习的beans.xml
+  2.@ComponentScan("com.study") ：配置扫描哪些包下的注解,等价于xml中的 <context:component-scan base-package="com.study"/>
+  4.@Import：导入合并其他配置类，类似于配置文件中的import标签
+  */
+  @Configuration
+  @ComponentScan("com.study") 
+  @Import(AppConfig2.class)  
+  public class AppConfig {
+  
+      /*
+      1.注册一个Bean,相当于之前写的<bean>标签
+      2.这个方法的名称相当于bean的id
+      3.这个方法的属性相当于bean的class
+       */
+      @Bean
+      public User getUser() {
+          return new User(); //就是返回要注入到bean的对象
+      }
+  }
+  ```
+
+- 测试类
+
+  ```java
+  public class MyTest {
+  
+      @Test
+      public void test(){
+          //如果完全使用配置类方式，我们只能通过AnnotationConfig上下文获取容器，通过配置类的class对象加载。
+          ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+          User user = context.getBean("getUser", User.class);
+          System.out.println(user);
+  
+      }
+  }
+  ```
+
+  
