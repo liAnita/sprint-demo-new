@@ -1,8 +1,5 @@
-package com.study.pojo;
+package com.study.demo01.pojo;
 
-import org.springframework.stereotype.Component;
-
-@Component
 public class Cat {
 
     public void shout(){

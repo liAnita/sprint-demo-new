@@ -1,4 +1,4 @@
-package com.study.pojo;
+package com.study.demo01.pojo;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

@@ -5,20 +5,20 @@
         https://www.springframework.org/schema/beans/spring-beans.xsd">
 
    <!-- 第一种，下标赋值的操作 index指的是元素的个数-->
-<!--   <bean id="user" class="com.study.pojo.User">-->
+<!--   <bean id="user" class="com.study.demo01.pojo.User">-->
 <!--      <constructor-arg index="0" value="langli"/>-->
 <!--   </bean>-->
 
    <!-- 第二种 类型 如果两个就不行了 不建议使用   -->
-<!--   <bean id="user" class="com.study.pojo.User">-->
+<!--   <bean id="user" class="com.study.demo01.pojo.User">-->
 <!--      <constructor-arg type="java.lang.String" value="langli2"/>-->
 <!--   </bean>-->
 
    <!--  第三种 ,参数名 掌握这一种就行 -->
-   <bean id="user" class="com.study.pojo.User">
+   <bean id="user" class="com.study.demo01.pojo.User">
       <constructor-arg name="name" value="langli3"/>
    </bean>
 
-   <bean id="user2" class="com.study.pojo.UserTwo">
+   <bean id="user2" class="com.study.demo01.pojo.UserTwo">
    </bean>
 </beans>

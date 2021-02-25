@@ -1,4 +1,4 @@
-import com.study.pojo.Person;
+import com.study.demo01.pojo.Person;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;

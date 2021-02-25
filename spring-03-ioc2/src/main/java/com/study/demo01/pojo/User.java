@@ -1,4 +1,4 @@
-package com.study.pojo;
+package com.study.demo01.pojo;
 
 public class User {
     String  name;

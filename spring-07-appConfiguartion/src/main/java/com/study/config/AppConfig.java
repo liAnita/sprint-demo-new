@@ -1,6 +1,6 @@
 package com.study.config;
 
-import com.study.pojo.User;
+import com.study.demo01.pojo.User;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

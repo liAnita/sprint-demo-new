@@ -1,3 +1,7 @@
+
+
+
+
 [狂神说笔记][https://www.kuangstudy.com/bbs/1344884033053581313](https://www.kuangstudy.com/bbs/1344884033053581313)
 
 https://mp.weixin.qq.com/s/kvp_3Uva1J2Q5ZVqCUzEsA
@@ -223,10 +227,10 @@ application.xml中导入多个配置，使用总的配置即可！
 
 ```xml
  <!--使用p-namespace（properties）进行更简洁的 XML 配置 -->
-    <bean id="user" class="com.study.pojo.User" p:name="易烊千玺" p:age="18"></bean>
+    <bean id="user" class="com.study.demo01.pojo.User" p:name="易烊千玺" p:age="18"></bean>
 
     <!--使用c-namespace(construct-arg)进行更简洁的 XML 配置 -->
-    <bean id="user2" class="com.study.pojo.User" c:name="四字弟弟" c:age="19"></bean>
+    <bean id="user2" class="com.study.demo01.pojo.User" c:name="四字弟弟" c:age="19"></bean>
 
 ```
 >注意事项：
@@ -580,4 +584,253 @@ JavaConfig 原来是 Spring 的一个子项目，它通过 Java 类的方式提�
   }
   ```
 
+
+
+
+#  代理模式
+
+为什么要学习代理模式，因为AOP的底层机制就是动态代理！
+
+代理模式：
+
+- 静态代理
+- 动态代理
+
+学习aop之前 , 我们要先了解一下代理模式！
+
+![image-20210225104522098](/Users/langli/Library/Application Support/typora-user-images/image-20210225104522098.png)
+
+### 1.静态代理
+
+**静态代理角色分析**
+
+- 抽象角色 : 一般使用接口或者抽象类来实现
+- 真实角色 : 被代理的角色
+- 代理角色 : 代理真实角色 ; 代理真实角色后 , 一般会做一些附属的操作 
+- 客户  :  使用代理角色来进行一些操作 
+
+**代码实现**
+
+Rent.java 即抽象角色
+
+```java
+//抽象角色：租房
+public interface Rent {
+   public void rent();
+}
+```
+
+Host.java 即真实角色
+
+```java
+//真实角色: 房东，房东要出租房子
+public class Host implements Rent{
+   public void rent() {
+       System.out.println("房屋出租");
+  }
+}
+```
+
+Proxy.java 即代理角色
+
+```java
+//代理角色：中介
+public class Proxy implements Rent {
+
+   private Host host;
+   public Proxy() { }
+   public Proxy(Host host) {
+       this.host = host;
+  }
+
+   //租房
+   public void rent(){
+       seeHouse();
+       host.rent();
+       fare();
+  }
+   //看房
+   public void seeHouse(){
+       System.out.println("带房客看房");
+  }
+   //收中介费
+   public void fare(){
+       System.out.println("收中介费");
+  }
+}
+```
+
+Client.java 即客户
+
+```
+//客户类，一般客户都会去找代理！
+public class Client {
+   public static void main(String[] args) {
+       //房东要租房
+       Host host = new Host();
+       //中介帮助房东
+       Proxy proxy = new Proxy(host);
+       //你去找中介！
+       proxy.rent();
+  }
+}
+```
+
+分析：在这个过程中，你直接接触的就是中介，就如同现实生活中的样子，你看不到房东，但是你依旧租到了房东的房子通过代理，这就是所谓的代理模式，程序源自于生活，所以学编程的人，一般能够更加抽象的看待生活中发生的事情。
+
+**静态代理的好处:**
+
+- 可以使得我们的真实角色更加纯粹 . 不再去关注一些公共的事情 .
+- 公共的业务由代理来完成 . 实现了业务的分工 ,
+- 公共业务发生扩展时变得更加集中和方便 .
+
+**缺点 :**
+
+- 类多了 , 多了代理类 , 工作量变大了 . 开发效率降低 .
+
+我们想要静态代理的好处，又不想要静态代理的缺点，所以 , 就有了动态代理 !
+
+==我们在不改变原来的代码的情况下，实现了对原有功能的增强，这是AOP中最核心的思想==
+
+AOP：纵向开发，横向开发
+
+![image-20210225105106854](/Users/langli/Library/Application Support/typora-user-images/image-20210225105106854.png)
+
+### 2.动态代理
+
+[其他参考文档](https://segmentfault.com/a/1190000011291179)
+
+动态代理利用了[JDK API](http://tool.oschina.net/uploads/apidocs/jdk-zh/)，动态地在内存中构建代理对象，从而实现对目标对象的代理功能。动态代理又被称为JDK代理或接口代理。
+
+静态代理与动态代理的区别主要在：
+
+- 静态代理在编译时就已经实现，编译完成后代理类是一个实际的class文件
+- 动态代理是在运行时动态生成的，即编译完成后没有实际的class文件，而是在运行时动态生成类字节码，并加载到JVM中
+
+>- 动态代理的角色和静态代理的一样 .
+>
+>- 动态代理的代理类是动态生成的 . 静态代理的代理类是我们提前写好的
+>- 动态代理分为两类 : 一类是基于接口动态代理 , 一类是基于类的动态代理
+>  - 基于接口的动态代理----JDK动态代理
+>  - 基于类的动态代理--cglib
+>  - 现在用的比较多的是 javasist 来生成动态代理 .
+>  - 我们这里使用JDK的原生代码来实现，其余的道理都是一样的！
+
+**特点：**
+动态代理对象不需要实现接口，但是要求目标对象必须实现接口，否则不能使用动态代理。
+
+JDK中生成代理对象主要涉及的类有：
+
+- [java.lang.reflect Proxy](http://tool.oschina.net/uploads/apidocs/jdk-zh/java/lang/reflect/Proxy.html)，主要方法为
+
+  ```java
+  static Object    newProxyInstance(ClassLoader loader,  //指定当前目标对象使用类加载器
   
+   Class<?>[] interfaces,    //目标对象实现的接口的类型
+   InvocationHandler h      //事件处理器
+  ) 
+  //返回一个指定接口的代理类实例，该接口可以将方法调用指派到指定的调用处理程序。
+  ```
+
+- [java.lang.reflect InvocationHandler](http://tool.oschina.net/uploads/apidocs/jdk-zh/java/lang/reflect/InvocationHandler.html)，主要方法为
+
+  ```java
+  // 在代理实例上处理方法调用并返回结果。 
+  Object invoke(Object proxy, Method method, Object[] args) 
+  /*参数
+  proxy - 调用该方法的代理实例
+  method -方法对应于调用代理实例上的接口方法的实例。方法对象的声明类将是该方法声明的接口，它可以是代理类继承该方法的代理接口的超级接口。
+  args -包含的方法调用传递代理实例的参数值的对象的阵列，或null如果接口方法没有参数。原始类型的参数包含在适当的原始包装器类的实例中，例如java.lang.Integer或java.lang.Boolean 。*/
+  ```
+
+  **代码实现**：
+
+  - 接口类：Rent
+
+  ```java
+  //抽象角色：租房
+  public interface Rent {
+     public void rent();
+  }
+  ```
+
+  - 目标对象：Host
+
+  ```java
+  //真实角色: 房东，房东要出租房子
+  public class Host implements Rent{
+     public void rent() {
+         System.out.println("房屋出租");
+    }
+  }
+  ```
+
+  - 动态代理对象：UserProxyFactory
+
+  ```java
+  package com.demo03.proxy;
+  
+  import java.lang.reflect.InvocationHandler;
+  import java.lang.reflect.Method;
+  import java.lang.reflect.Proxy;
+  
+  public class ProxyInvocationHandle implements InvocationHandler {
+  
+      private Object target;
+  
+      public void setTarget(Object target) {
+          this.target = target;
+      }
+  
+      //生成代理类，重点是第二个参数，获取要代理的抽象角色！之前都是一个角色，现在可以代理一类角色
+      public Object getProxy() {
+          return Proxy.newProxyInstance(target.getClass().getClassLoader(), target.getClass().getInterfaces(), this);
+      }
+  
+  
+      // proxy : 代理类 method : 代理类的调用处理程序的方法对象.
+      // 处理代理实例上的方法调用并返回结果
+      @Override
+      public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+          //核心：本质利用反射实现！
+          method.invoke(target, args);
+          return null;
+      }
+  }
+  ```
+
+  	- 测试类 Client
+
+  ```java
+  public class Client {
+      public static void main(String[] args) {
+  //        Rent host = new Host();
+  //        ProxyInvocationHandle proxyInvocationHandle = new ProxyInvocationHandle();
+  //        proxyInvocationHandle.setTarget(host);
+  //        Rent proxy = (Rent) proxyInvocationHandle.getProxy();
+  //        proxy.rent();
+          //真实角色
+          UserImpl user = new User();
+          //代理实例的调用处理程序
+          ProxyInvocationHandle proxyInvocationHandle = new ProxyInvocationHandle();
+          proxyInvocationHandle.setTarget(user);//将真实角色放置进去！
+          UserImpl proxy = (UserImpl) proxyInvocationHandle.getProxy();//动态生成对应的代理类！
+          proxy.delete();
+      }
+  }
+  ```
+
+  核心：**一个动态代理 , 一般代理某一类业务 , 一个动态代理可以代理多个类，代理的是接口！、**
+
+  静态代理有的它都有，静态代理没有的，它也有！
+
+  - 可以使得我们的真实角色更加纯粹 . 不再去关注一些公共的事情 .
+  - 公共的业务由代理来完成 . 实现了业务的分工 ,
+  - 公共业务发生扩展时变得更加集中和方便 .
+  - 一个动态代理 , 一般代理某一类业务
+  - 一个动态代理可以代理多个类，代理的是接口！
+
+
+
+
+

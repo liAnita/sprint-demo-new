@@ -16,6 +16,7 @@
         <module>spring-05-autowired</module>
         <module>spring-06-annotation</module>
         <module>spring-07-appConfiguartion</module>
+        <module>spring-08-proxy</module>
     </modules>
     <dependencies>
         <dependency>
@@ -44,6 +45,11 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-aop</artifactId>
             <version>5.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <version>3.2.5</version>
         </dependency>
     </dependencies>
 

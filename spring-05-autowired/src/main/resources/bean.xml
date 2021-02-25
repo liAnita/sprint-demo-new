@@ -7,11 +7,11 @@
         http://www.springframework.org/schema/context
         https://www.springframework.org/schema/context/spring-context.xsd">
 
-    <bean id="cat1" class="com.study.pojo.Cat"></bean>
-<!--    <bean id="cat2" class="com.study.pojo.Cat"></bean>-->
-    <bean id="dog" class="com.study.pojo.Dog"></bean>
-    <bean id="dog2" class="com.study.pojo.Dog"></bean>
-    <bean id="person" class="com.study.pojo.Person">
+    <bean id="cat1" class="com.study.demo01.pojo.Cat"></bean>
+<!--    <bean id="cat2" class="com.study.demo01.pojo.Cat"></bean>-->
+    <bean id="dog" class="com.study.demo01.pojo.Dog"></bean>
+    <bean id="dog2" class="com.study.demo01.pojo.Dog"></bean>
+    <bean id="person" class="com.study.demo01.pojo.Person">
         <property name="name" value="小可爱啊"></property>
     </bean>
 
@@ -20,7 +20,7 @@
 
     <!-- byName : 会在上下文中自动化查找，和自己对象set方法参数值相同的beanId-->
     <!-- byType : 会在上下文中自动化查找，和自己对象属性相同的bean, bytype可以省略beanId-->
-<!--    <bean id="person" class="com.study.pojo.Person" autowire="byName">-->
+<!--    <bean id="person" class="com.study.demo01.pojo.Person" autowire="byName">-->
 <!--        <property name="name" value="易烊千玺小可爱"/>-->
         <!--可以通过autowire自动装配属性 ，不需要设置属性值 -->
         <!--        <property name="dog" ref="dog"/>-->

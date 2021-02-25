@@ -3,10 +3,10 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         https://www.springframework.org/schema/beans/spring-beans.xsd">
-    <bean id="address" class="com.study.pojo.Address">
+    <bean id="address" class="com.study.demo01.pojo.Address">
         <property name="address" value="上海"/>
     </bean>
-    <bean id="student" class="com.study.pojo.Student">
+    <bean id="student" class="com.study.demo01.pojo.Student">
         <!-- 普通值注入  value=...    -->
         <property name="name" value="易烊千玺"/>
 

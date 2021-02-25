@@ -2,7 +2,7 @@ import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import com.study.config.AppConfig;
-import com.study.pojo.User;
+import com.study.demo01.pojo.User;
 
 public class MyTest {
 
