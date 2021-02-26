@@ -830,7 +830,234 @@ JDK中生成代理对象主要涉及的类有：
   - 一个动态代理 , 一般代理某一类业务
   - 一个动态代理可以代理多个类，代理的是接口！
 
+# AOP
 
+### 1.介绍
 
+> 什么是AOP
+>
+> AOP（Aspect Oriented Programming）意为：面向切面编程，通过预编译方式和运行期动态代理实现程序功能的统一维护的一种技术。AOP是OOP的延续，是软件开发中的一个热点，也是Spring框架中的一个重要内容，是函数式编程的一种衍生范型。利用AOP可以对业务逻辑的各个部分进行隔离，从而使得业务逻辑各部分之间的耦合度降低，提高程序的可重用性，同时提高了开发的效率。
 
+![image-20210226114341577](/Users/langli/Library/Application Support/typora-user-images/image-20210226114341577.png)
+
+>Aop在Spring中的作用
+>
+>==**提供声明式事务；允许用户自定义切面**==
+>
+>以下名词需要了解下
+>
+>- 横切关注点：跨越应用程序多个模块的方法或功能。即是，与我们业务逻辑无关的，但是我们需要关注的部分，就是横切关注点。如日志 , 安全 , 缓存 , 事务等等 ....
+>- 切面（ASPECT）：横切关注点 被模块化 的特殊对象。即，它是一个类。
+>- 通知（Advice）：切面必须要完成的工作。即，它是类中的一个方法。
+>- 目标（Target）：被通知对象。
+>- 代理（Proxy）：向目标对象应用通知之后创建的对象。
+>- 切入点（PointCut）：切面通知 执行的 “地点”的定义。
+>- 连接点（JointPoint）：与切入点匹配的执行点。
+
+![image-20210226114748799](/Users/langli/Library/Application Support/typora-user-images/image-20210226114748799.png)
+
+SpringAOP中，通过Advice定义横切逻辑，Spring中支持5种类型的Advice:
+
+![image-20210226115005961](/Users/langli/Library/Application Support/typora-user-images/image-20210226115005961.png)
+
+即 Aop 在 不改变原有代码的情况下 , 去增加新的功能 .
+
+### 2.使用Spring实现Aop
+
+==使用AOP织入，需要导入一个依赖包==
+
+```xml
+<!-- https://mvnrepository.com/artifact/org.aspectj/aspectjweaver -->
+<dependency>
+   <groupId>org.aspectj</groupId>
+   <artifactId>aspectjweaver</artifactId>
+   <version>1.9.4</version>
+</dependency>
+```
+
+##### 方式一：Spring API实现
+
+接口
+
+```java
+public interface UserDao {
+    public void add();
+    public void update();
+    public void select();
+    public void delete();
+}
+```
+
+实现类
+
+```java
+@Component
+public class UserService implements UserDao {
+
+    @Override
+    public void add() {
+        System.out.println("新增用户");
+    }
+
+    @Override
+    public void update() {
+        System.out.println("更新用户");
+    }
+
+    @Override
+    public void select() {
+        System.out.println("查询用户");
+    }
+
+    @Override
+    public void delete() {
+        System.out.println("删除用户");
+    }
+}
+```
+
+增强类 ：一个前置增强 一个后置增强
+
+```java
+@Component
+public class LogAfter implements AfterReturningAdvice {
+    //returnValue 返回值
+    //method被调用的方法
+    //args 被调用的方法的对象的参数
+    //target 被调用的目标对象
+    @Override
+    public void afterReturning(Object returnValue, Method method, Object[] args, Object target) throws Throwable {
+        System.out.println(target.getClass().getName() + "的" + method.getName() + "执行完毕！");
+    }
+}
+```
+
+```java
+@Component
+public class LogBefore implements MethodBeforeAdvice {
+
+    //method : 要执行的目标对象的方法
+    //objects : 被调用的方法的参数
+    //Object : 目标对象
+    @Override
+    public void before(Method method, Object[] arg, Object target) throws Throwable {
+        System.out.println(target.getClass().getName() + "的" + method.getName() + "准备开始执行了！");
+    }
+}
+```
+
+最后去spring的文件中注册 , 并实现aop切入实现 , 注意导入aop约束 .
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop
+        https://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+    <!--使用注解注册bean-->
+    <context:annotation-config></context:annotation-config>
+    <!--扫描指定包下的注解-->
+    <context:component-scan base-package="com"/>
+
+    <!--方式一：通过Spring API实现-->
+    <!--aop配置-->
+    <aop:config>
+        <!--切入点 expression:表达式匹配要执行的方法-->
+        <aop:pointcut id="pointcut" expression="execution(* com.service.UserService.*(..))"/>
+        <!--执行环绕; advice-ref执行方法 . pointcut-ref切入点-->
+        <aop:advisor advice-ref="logBefore" pointcut-ref="pointcut"/>
+        <aop:advisor advice-ref="logAfter" pointcut-ref="pointcut"/>
+    </aop:config>
+</beans>
+```
+
+测试类
+
+```java
+public class AopTest {
+    @Test
+    public void test1(){
+       ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+       //代理（Proxy）：向目标对象应用通知之后创建的对象。
+       UserDao userDao = context.getBean("userService", UserDao.class);
+        userDao.add();
+    }
+}
+```
+
+##### 方式二：自定义类实现AOP
+
+1.自定义类
+
+```java
+@Component
+public class DiyLog {
+    public void methodBefore() {
+        System.out.println("方式执行前");
+    }
+
+    public void methodAfter() {
+        System.out.println("方法执行后");
+    }
+}
+```
+
+2.Spring配置文件中增加aop配置
+
+```xml
+<!--第二种方式：使用AOP的标签实现-->
+<aop:config>
+  <!--切面-->
+  <aop:aspect ref="diyLog">
+    <aop:pointcut id="pointcut" expression="execution(* com.service.UserService.*(..))"/>
+    <aop:before method="methodBefore" pointcut-ref="pointcut"/>
+    <aop:after-returning method="methodAfter" pointcut-ref="pointcut"/>
+  </aop:aspect>
+</aop:config>
+```
+
+##### 方式三：使用注解实现
+
+1.编写注解实现的增强类，使用@Component将类注册到bean
+
+```java
+@Component
+@Aspect //定义切面就是annotationPointcut
+//切面（ASPECT）：横切关注点 被模块化 的特殊对象。即，它是一个类。
+public class AnnotationPointcut {
+
+    //目标（Target）：UserService，被通知对象。
+    //切入点（PointCut）：切面通知 执行的 “地点”的定义。
+    @Before("execution(* com.service.UserService.*(..))")
+    //通知（Advice）：切面必须要完成的工作。即，它是类中的一个方法。
+    public void methodBefore() {
+        System.out.println("方法执行前");
+    }
+
+    @AfterReturning("execution(* com.service.UserService.*(..))")
+    public void methodAfter() {
+        System.out.println("方法执行后");
+    }
+}
+```
+
+2.在Spring配置文件中，增加支持注解的配置
+
+```xml
+<!--第三种方式：注解实现-->
+<aop:aspectj-autoproxy proxy-target-class="true"></aop:aspectj-autoproxy>
+<!-- proxy-target-class属性：默认为false，表示使用jdk动态代理织入增强，true：表示使用CGLib动态代理技术织入增强-->
+```
+
+>aop:aspectj-autoproxy：说明
+>
+>```
+>通过aop命名空间的<aop:aspectj-autoproxy />声明自动为spring容器中那些配置@aspectJ切面的bean创建代理，织入切面。当然，spring 在内部依旧采用AnnotationAwareAspectJAutoProxyCreator进行自动代理的创建工作，但具体实现的细节已经被<aop:aspectj-autoproxy />隐藏起来了
+>
+><aop:aspectj-autoproxy />有一个proxy-target-class属性，默认为false，表示使用jdk动态代理织入增强，当配为<aop:aspectj-autoproxy  poxy-target-class="true"/>时，表示使用CGLib动态代理技术织入增强。不过即使proxy-target-class设置为false，如果目标类没有声明接口，则spring将自动使用CGLib动态代理。
+>```
 

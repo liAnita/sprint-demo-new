@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop
+        https://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+    <!--使用注解注册bean-->
+    <context:annotation-config></context:annotation-config>
+    <!--扫描指定包下的注解-->
+    <context:component-scan base-package="com"/>
+
+    <!--方式一：通过Spring API实现-->
+    <!--aop配置-->
+<!--    <aop:config>-->
+<!--        &lt;!&ndash;切入点 expression:表达式匹配要执行的方法&ndash;&gt;-->
+<!--        <aop:pointcut id="pointcut" expression="execution(* com.service.UserService.*(..))"/>-->
+<!--        &lt;!&ndash;执行环绕; advice-ref执行方法 . pointcut-ref切入点&ndash;&gt;-->
+<!--        <aop:advisor advice-ref="logBefore" pointcut-ref="pointcut"/>-->
+<!--        <aop:advisor advice-ref="logAfter" pointcut-ref="pointcut"/>-->
+<!--    </aop:config>-->
+
+    <!--第二种方式：使用AOP的标签实现-->
+    <aop:config>
+        <!--切面-->
+        <aop:aspect ref="diyLog">
+            <aop:pointcut id="pointcut" expression="execution(* com.service.UserService.*(..))"/>
+            <aop:before method="methodBefore" pointcut-ref="pointcut"/>
+            <aop:after-returning method="methodAfter" pointcut-ref="pointcut"/>
+        </aop:aspect>
+    </aop:config>
+
+    <!--第三种方式：注解实现-->
+    <aop:aspectj-autoproxy proxy-target-class="true"></aop:aspectj-autoproxy>
+<!--    proxy-target-class属性：默认为false，表示使用jdk动态代理织入增强，true：表示使用CGLib动态代理技术织入增强-->
+
+</beans>
