@@ -1061,3 +1061,228 @@ public class AnnotationPointcut {
 ><aop:aspectj-autoproxy />有一个proxy-target-class属性，默认为false，表示使用jdk动态代理织入增强，当配为<aop:aspectj-autoproxy  poxy-target-class="true"/>时，表示使用CGLib动态代理技术织入增强。不过即使proxy-target-class设置为false，如果目标类没有声明接口，则spring将自动使用CGLib动态代理。
 >```
 
+
+
+# Mybatis-spring
+
+### 1.mybatis回顾
+
+- 工具类
+
+  ```java
+  public class MybatisUtil {
+  
+      private static InputStream inputStream;
+      private static SqlSessionFactory sqlSessionFactory;
+  
+      static {
+          try {
+              String resource = "mybatis-config.xml";
+              inputStream = Resources.getResourceAsStream(resource);
+              sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+          } catch (IOException e) {
+              e.printStackTrace();
+          }
+      }
+  
+      public static SqlSession getSqlSession() {
+          return sqlSessionFactory.openSession();
+      }
+  }
+  ```
+
+- 实体类 
+
+```java
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class User {
+    private int id;
+    private String name;
+    private String pwd;
+}
+```
+
+- 编写mybatis核心配置文件
+
+  ```xml
+  <?xml version="1.0" encoding="UTF-8" ?>
+  <!DOCTYPE configuration
+          PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+          "http://mybatis.org/dtd/mybatis-3-config.dtd">
+  <!--configuration核心配置文件-->
+  <configuration>
+      <properties resource="db.properties"></properties>
+      <typeAliases>
+          <typeAlias type="com.pojo.User" alias="user"/>
+      </typeAliases>
+      <environments default="development">
+          <environment id="development">
+              <transactionManager type="JDBC"/>
+              <dataSource type="POOLED">
+                  <property name="driver" value="${driver}"/>
+                  <property name="url" value="${url}"/>
+                  <property name="username" value="${username}"/>
+                  <property name="password" value="${password}"/>
+              </dataSource>
+          </environment>
+      </environments>
+      <mappers>
+          <mapper class="com.mapper.UserMapper"/>
+      </mappers>
+  </configuration>
+  ```
+
+- UserMapper接口&userMapper.xml
+
+  ```java
+  public interface UserMapper {
+      List<User> selectUser();
+  }
+  ```
+
+  ```xml
+  <?xml version="1.0" encoding="UTF-8" ?>
+  <!DOCTYPE mapper
+          PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+          "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <!--命名空间（Namespaces）绑定一个Dao/Mapper接口-->
+  <mapper namespace="com.mapper.UserMapper">
+      <select id="selectUser" resultType="user">
+          select * from user
+      </select>
+  </mapper>
+  ```
+
+- 测试
+
+  ```java
+  public class ReviewMybatis {
+      @Test
+      public void test() {
+          SqlSession sqlSession = MybatisUtil.getSqlSession();
+          UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+          List<User> users = mapper.selectUser();
+          for (User user : users) {
+              System.out.println(user);
+          }
+      }
+  }
+  ```
+
+### 2.mybaits-spring
+
+[mybaits-spring官网](https://mybatis.org/spring/zh/)
+
+**入门**
+
+1. 导包
+
+   ```xml
+   <dependency>
+     <groupId>org.mybatis</groupId>
+     <artifactId>mybatis-spring</artifactId>
+     <version>2.0.6</version>
+   </dependency>
+   ```
+
+2. 参照mybatis工具类，spring使用mybaits需要以下三步
+
+   - 加载resource
+
+     ```java
+     //mybatis代码实现
+     String resource = "mybatis-config.xml";
+     inputStream = Resources.getResourceAsStream(resource);
+     ```
+
+     ```xml
+     <!--使用spring配置mybatis的数据源，原来这部分配置是写在mybatis-config.xml中-->
+     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+       <!-- <property name="driverClassName" value="com.mysql.jdbc.Driver"/>-->
+       <property name="username" value="${username}"/>
+       <property name="password" value="${password}"/>
+       <property name="url" value="${url}"/>
+     </bean>
+     ```
+
+     ```xml
+      <!-- spring中使用properties配置-->
+      <context:property-placeholder ignore-unresolvable="true" location="classpath:db.properties"/>
+     ```
+
+   - 用SqlSessionFactoryBuilder创建sqlSessionFactory
+
+     ```java
+     //mybatis代码实现
+     sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+     ```
+
+     ```xml
+     <!--配置sqlSessionFactory-->
+     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+         <property name="dataSource" ref="dataSource"/>
+         <!--关联mybatis配置-->
+         <property name="configLocation" value="classpath:mybatis-config.xml"/>
+         <!--导入mapper.xml, 等价于mybatis配置中：<mappers>-->
+         <property name="mapperLocations" value="classpath:com/mapper/*.xml"/>
+     </bean>
+     ```
+
+   - 获取sqlSession
+
+     ```java
+     //mybatis代码实现
+     public static SqlSession getSqlSession() {
+       return sqlSessionFactory.openSession();
+     }
+     ```
+
+     ```xml
+     <!--注册sqlSessionTemplate , 关联sqlSessionFactory-->
+     <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+         <!--利用构造器注入 因为该类没有set方法-->
+         <constructor-arg index="0" ref="sqlSessionFactory"/>
+     </bean>
+     ```
+
+   配置完成后，需要增加一个接口实现类并注册到bean
+
+   ```java
+   @Component
+   public class UserDaoImpl implements UserMapper {
+   
+     //sqlSession不用我们自己创建了，Spring来管理  
+      private SqlSession sqlSession;
+   
+       @Autowired
+       public void setSqlSessionTemplate(SqlSession sqlSession) {
+           this.sqlSession = sqlSession;
+       }
+   
+       @Override
+       public List<User> selectUser() {
+           UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+           List<User> users = mapper.selectUser();
+           return users;
+       }
+   }
+   ```
+
+测试类
+
+```java
+public class SprintMybatisTest {
+    @Test
+    public void test(){
+        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+        UserMapper userDao = context.getBean("userDaoImpl", UserMapper.class);
+        List<User> users = userDao.selectUser();
+        for (User user : users) {
+            System.out.println(user);
+        }
+    }
+}
+```
+

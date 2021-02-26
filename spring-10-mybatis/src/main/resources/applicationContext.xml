@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+    <context:annotation-config></context:annotation-config>
+
+    <context:component-scan base-package="com"></context:component-scan>
+
+    <!-- spring中使用properties配置-->
+    <context:property-placeholder ignore-unresolvable="true" location="classpath:db.properties"/>
+
+    <!--配置sqlSessionFactory-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!--关联mybatis配置-->
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+        <!--导入mapper.xml, 等价于mybatis配置中：<mappers>-->
+        <property name="mapperLocations" value="classpath:com/mapper/*.xml"/>
+    </bean>
+
+    <!--注册sqlSessionTemplate , 关联sqlSessionFactory-->
+    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <!--利用构造器注入 因为该类没有set方法-->
+        <constructor-arg index="0" ref="sqlSessionFactory"/>
+    </bean>
+
+    <!--使用spring配置mybatis的数据源，原来这部分配置是写在mybatis-config.xml中-->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <!-- <property name="driverClassName" value="com.mysql.jdbc.Driver"/>-->
+        <property name="username" value="${username}"/>
+        <property name="password" value="${password}"/>
+        <property name="url" value="${url}"/>
+    </bean>
+<!--    <bean id="userDao" class="com.pojo.UserDaoImpl">-->
+<!--        <property name="sqlSessionTemplate" ref="sqlSessionTemplate"/>-->
+<!--    </bean>-->
+
+</beans>
