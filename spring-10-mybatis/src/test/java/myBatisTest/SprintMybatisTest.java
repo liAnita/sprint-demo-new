@@ -19,4 +19,15 @@ public class SprintMybatisTest {
         }
 
     }
+
+    @Test
+    public void test2(){
+        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+        UserMapper userDao = context.getBean("userDaoImpl2", UserMapper.class);
+        List<User> users = userDao.selectUser();
+        for (User user : users) {
+            System.out.println(user);
+        }
+
+    }
 }

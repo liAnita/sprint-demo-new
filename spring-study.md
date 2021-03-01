@@ -1232,13 +1232,15 @@ public class User {
 
    - 获取sqlSession
 
+     - **方式一 ：SqlSessionTemplate**
+     
      ```java
      //mybatis代码实现
      public static SqlSession getSqlSession() {
        return sqlSessionFactory.openSession();
-     }
+   }
      ```
-
+     
      ```xml
      <!--注册sqlSessionTemplate , 关联sqlSessionFactory-->
      <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
@@ -1269,6 +1271,27 @@ public class User {
        }
    }
    ```
+
+   - **方式二 ：SqlSessionDaoSupport**
+
+      ```java
+//继承SqlSessionDaoSupport实现，底层其实也是使用SqlSessionTemplete
+//SqlSessionDaoSupport 需要两个参数：setSqlSessionFactory or SqlSessionTemplete
+@Component
+public class UserDaoImpl2 extends SqlSessionDaoSupport implements UserMapper {
+
+    @Override
+    @Autowired //自动装配setSqlSessionFactory
+    public void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
+        super.setSqlSessionFactory(sqlSessionFactory);
+    }
+
+    @Override
+    public List<User> selectUser() {
+        return super.getSqlSession().getMapper(UserMapper.class).selectUser();
+    }
+}
+      ```
 
 测试类
 

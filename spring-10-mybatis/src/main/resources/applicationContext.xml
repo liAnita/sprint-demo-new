@@ -26,7 +26,9 @@
         <constructor-arg index="0" ref="sqlSessionFactory"/>
     </bean>
 
-    <!--使用spring配置mybatis的数据源，原来这部分配置是写在mybatis-config.xml中-->
+    <!--dataSource:使用spring的数据源替代mybatis的配置，c3p0 dbcp druid
+        这里使用spring提供的jdbc:org.springframework.jdbc
+    -->
     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <!-- <property name="driverClassName" value="com.mysql.jdbc.Driver"/>-->
         <property name="username" value="${username}"/>
@@ -36,5 +38,7 @@
 <!--    <bean id="userDao" class="com.pojo.UserDaoImpl">-->
 <!--        <property name="sqlSessionTemplate" ref="sqlSessionTemplate"/>-->
 <!--    </bean>-->
-
+<!--    <bean id="userDaoImpl2" class="com.pojo.UserDaoImpl2">-->
+<!--        <property name="sqlSessionFactory" ref="sqlSessionFactory"></property>-->
+<!--    </bean>-->
 </beans>
