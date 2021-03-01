@@ -1293,7 +1293,7 @@ public class UserDaoImpl2 extends SqlSessionDaoSupport implements UserMapper {
 }
       ```
 
-测试类
+​    测试类
 
 ```java
 public class SprintMybatisTest {
@@ -1308,4 +1308,177 @@ public class SprintMybatisTest {
     }
 }
 ```
+
+
+
+# Spring事务
+
+**事务：**
+
+- 要么都成功，要么都失败
+- 十分重要，涉及到数据一致性
+- 确保完整性和一致性
+
+**事务的ACID原则:**
+
+- 原子性
+- 一致性
+- 隔离性
+  - 多个业务可能操作一个资源，防止数据损坏
+- 持久性
+  - 事务一旦提交，无论系统发生什么问题，结果都不会被影响。
+
+
+
+Spring中的事务管理
+
+- 声明式事务
+- 编程式事务
+
+### 声明式事务
+
+1. mapper
+
+   ```java
+   
+   public interface UserMapper {
+       List<User> selectUser();
+   
+       int insert(User user);
+   
+       int delete(@Param("id") int id);
+   }
+   ```
+
+   ```xml
+   <?xml version="1.0" encoding="UTF-8" ?>
+   <!DOCTYPE mapper
+           PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+           "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   <!--命名空间（Namespaces）绑定一个Dao/Mapper接口-->
+   <mapper namespace="com.mapper.UserMapper">
+       <select id="selectUser" resultType="user">
+           select * from user
+       </select>
+       <insert id="insert" parameterType="user">
+           insert into mybatis.user (name ,pwd) values (#{name},#{pwd})
+       </insert>
+       <delete id="delete" parameterType="int">
+           delete from user where id = #{id}
+       </delete>
+   </mapper>
+   ```
+
+2. 接口实现类
+
+   ```java
+   @Component
+   public class UserDaoImpl2 extends SqlSessionDaoSupport implements UserMapper {
+   
+       @Override
+       @Autowired
+       public void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
+           super.setSqlSessionFactory(sqlSessionFactory);
+       }
+   
+       @Override
+       public List<User> selectUser() {
+           User user = new User("黄黄", "ererer");
+           insert(user);
+           delete(9);
+           return super.getSqlSession().getMapper(UserMapper.class).selectUser();
+       }
+   
+       @Override
+       public int insert(User user) {
+           return super.getSqlSession().getMapper(UserMapper.class).insert(user);
+       }
+   
+       @Override
+       public int delete(int id) {
+           return super.getSqlSession().getMapper(UserMapper.class).delete(id);
+       }
+   }
+   ```
+
+   
+
+3. Spring xml配置
+
+   ```xml
+   <?xml version="1.0" encoding="UTF-8"?>
+   <beans xmlns="http://www.springframework.org/schema/beans"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns:context="http://www.springframework.org/schema/context"
+          xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+          xsi:schemaLocation="http://www.springframework.org/schema/beans
+           https://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           https://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx.xsd
+           http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+       <context:annotation-config></context:annotation-config>
+   
+       <context:component-scan base-package="com"></context:component-scan>
+   
+       <!-- spring中使用properties配置-->
+       <context:property-placeholder ignore-unresolvable="true" location="classpath:db.properties"/>
+   
+       <!--配置sqlSessionFactory-->
+       <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+           <property name="dataSource" ref="dataSource"/>
+           <!--关联mybatis配置-->
+           <property name="configLocation" value="classpath:mybatis-config.xml"/>
+           <!--导入mapper.xml, 等价于mybatis配置中：<mappers>-->
+           <property name="mapperLocations" value="classpath:com/mapper/*.xml"/>
+       </bean>
+   
+       <!--注册sqlSessionTemplate , 关联sqlSessionFactory-->
+       <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+           <!--利用构造器注入 因为该类没有set方法-->
+           <constructor-arg index="0" ref="sqlSessionFactory"/>
+       </bean>
+   
+       <!--dataSource:使用spring的数据源替代mybatis的配置，c3p0 dbcp druid
+           这里使用spring提供的jdbc:org.springframework.jdbc
+       -->
+       <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+           <!-- <property name="driverClassName" value="com.mysql.jdbc.Driver"/>-->
+           <property name="username" value="${username}"/>
+           <property name="password" value="${password}"/>
+           <property name="url" value="${url}"/>
+       </bean>
+   
+       <!-- 声明式事务-->
+       <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+           <constructor-arg ref="dataSource"/>
+       </bean>
+   
+       <!-- 结合aop实现事务织入-->
+       <tx:advice id="tx1" transaction-manager="transactionManager">
+           <!--给哪些方法配置事务-->
+           <!--配置事务的传播特性-->
+           <tx:attributes>
+               <tx:method name="add" propagation="REQUIRED"/>
+               <tx:method name="delete" propagation="REQUIRED"/>
+               <!--给所有方法配置事务-->
+               <tx:method name="*" propagation="REQUIRED"/>
+           </tx:attributes>
+       </tx:advice>
+   
+       <!--配置事务切入-->
+       <aop:config>
+           <aop:pointcut id="txPointcut" expression="execution(* com.mapper.*.*(..))"/>
+           <aop:advisor advice-ref="tx1" pointcut-ref="txPointcut"></aop:advisor>
+       </aop:config>
+   </beans>
+   ```
+
+测试总结：
+
+- 未配置事务时，当有sql报错，执行selectUser()方法，有新数据插入
+- 配置事务后，当有sql报错，执行selectUser()方法，没有新数据插入
+
+
 

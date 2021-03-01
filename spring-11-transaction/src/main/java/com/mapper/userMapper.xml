@@ -7,5 +7,10 @@
     <select id="selectUser" resultType="user">
         select * from user
     </select>
-
+    <insert id="insert" parameterType="user">
+        insert into mybatis.user (name ,pwd) values (#{name},#{pwd})
+    </insert>
+    <delete id="delete" parameterType="int">
+        delete from user where id = #{id}
+    </delete>
 </mapper>
